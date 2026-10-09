@@ -1,0 +1,29 @@
+[project]
+name = "telegram-keyword-responder"
+version = "0.2.0"
+description = "Group-only Telegram keyword auto-responder with a mobile-friendly web panel."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Xiaowu" }]
+dependencies = [
+    "starlette>=0.40",
+    "uvicorn>=0.30",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
+    "itsdangerous>=2.2",
+    "telethon>=1.36",
+    "python-socks[asyncio]>=2.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "httpx>=0.27",
+]
+
+[project.urls]
+Repository = "https://github.com/Xiaowu-0916/telegram-keyword-responder"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

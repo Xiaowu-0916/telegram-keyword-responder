@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}关键词 · TG 群回复{% endblock %}
+{% block content %}
+<h1>关键词与回复</h1>
+
+<section class="card">
+  <h2>新增关键词</h2>
+  <form method="post" action="/rules/new" class="grid-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>规则名称<input name="name" placeholder="例如：价格咨询"></label>
+    <label>关键词或正则<input name="pattern" placeholder="价格|多少钱|怎么收费" required></label>
+    <label>匹配方式
+      <select name="match_type">
+        <option value="contains">包含</option>
+        <option value="regex">正则</option>
+        <option value="word">整词（仅英文）</option>
+      </select>
+      <div class="hint">中文关键词建议用“包含”或“正则”；“整词”只对英文单词生效，含中文时会自动按“包含”处理。</div>
+    </label>
+    <label>关键词冷却（秒）<input name="cooldown_seconds" inputmode="numeric" value="300"></label>
+    <label>同一用户冷却（秒）<input name="per_user_cooldown_seconds" inputmode="numeric" value="3600"></label>
+    <label class="span-2">回复内容<textarea name="reply" rows="3" placeholder="命中后引用回复的内容" required></textarea></label>
+    <label class="check"><input type="checkbox" name="case_sensitive"> 区分大小写</label>
+    <label class="check"><input type="checkbox" name="enabled" checked> 启用这条规则</label>
+    <fieldset class="span-2">
+      <legend>生效群组（不选表示所有已启用群）</legend>
+      {% if chats %}
+      <div class="check-list">
+        {% for chat in chats %}
+        <label class="check"><input type="checkbox" name="chat_ids" value="{{ chat['chat_id'] }}"> {{ chat["title"] }} <code>{{ chat["chat_id"] }}</code></label>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="muted">还没有启用任何群，请先去“群管理”选择群组。</p>
+      {% endif %}
+    </fieldset>
+    <div class="form-actions span-2"><button class="btn primary" type="submit">新增关键词</button></div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>已配置规则</h2><span class="muted">{{ rules|length }} 条</span></div>
+  {% if rules %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>名称</th><th>关键词</th><th>匹配</th><th>冷却</th><th>生效群</th><th>状态</th><th></th></tr></thead>
+      <tbody>
+        {% for rule in rules %}
+        <tr>
+          <td>{{ rule["name"] }}</td>
+          <td><code>{{ rule["pattern"] }}</code></td>
+          <td>{{ rule["match_type"] }}</td>
+          <td>{{ rule["cooldown_seconds"] }} 秒</td>
+          <td>
+            {% if assignments[rule["id"]] %}
+              {{ assignments[rule["id"]]|length }} 个群
+            {% else %}
+              全部
+            {% endif %}
+          </td>
+          <td>{% if rule["enabled"] %}<span class="badge sent">启用</span>{% else %}<span class="badge skipped">停用</span>{% endif %}</td>
+          <td class="nowrap">
+            <a class="link" href="/rules/{{ rule['id'] }}">编辑</a>
+            <form method="post" action="/rules/{{ rule['id'] }}/delete" class="inline" onsubmit="return confirm('确定删除这条规则？');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="link danger" type="submit">删除</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">还没有规则。</p>
+  {% endif %}
+</section>
+{% endblock %}

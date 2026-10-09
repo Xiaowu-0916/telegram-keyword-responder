@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}TG 群回复{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  {% if username %}
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">TG 群回复</a>
+      <form method="post" action="/logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn ghost small" type="submit">退出</button>
+      </form>
+    </div>
+    <nav class="nav">
+      <a href="/">总览</a>
+      <a href="/telegram">账号</a>
+      <a href="/groups">群管理</a>
+      <a href="/rules">关键词</a>
+      <a href="/logs">日志</a>
+      <a href="/settings">设置</a>
+    </nav>
+  </header>
+  {% endif %}
+  <main class="shell">
+    {% if msg %}<div class="notice ok">{{ msg }}</div>{% endif %}
+    {% if err %}<div class="notice bad">{{ err }}</div>{% endif %}
+    {% if error %}<div class="notice bad">{{ error }}</div>{% endif %}
+    {% if info %}<div class="notice info">{{ info }}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

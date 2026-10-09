@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}日志 · TG 群回复{% endblock %}
+{% block content %}
+<h1>运行日志</h1>
+
+<section class="card">
+  <form method="get" action="/logs" class="filter-form">
+    <label>群组
+      <select name="chat_id">
+        <option value="">全部</option>
+        {% for chat in chats %}
+        <option value="{{ chat['chat_id'] }}" {% if selected_chat == chat['chat_id'] %}selected{% endif %}>{{ chat["title"] }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>状态
+      <select name="status">
+        <option value="">全部</option>
+        <option value="sent" {% if selected_status == 'sent' %}selected{% endif %}>已发送</option>
+        <option value="skipped" {% if selected_status == 'skipped' %}selected{% endif %}>已跳过</option>
+        <option value="error" {% if selected_status == 'error' %}selected{% endif %}>错误</option>
+      </select>
+    </label>
+    <label>条数<input name="limit" inputmode="numeric" value="{{ limit }}"></label>
+    <button class="btn" type="submit">筛选</button>
+  </form>
+</section>
+
+<section class="card">
+  {% if events %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>时间</th><th>群</th><th>用户</th><th>关键词</th><th>状态</th><th>说明</th><th>回复</th></tr></thead>
+      <tbody>
+        {% for event in events %}
+        <tr>
+          <td class="nowrap">{{ event["ts"]|dt }}</td>
+          <td>{{ event["chat_title"] or event["chat_id"] }}</td>
+          <td>{{ event["user_name"] or event["user_id"] }}</td>
+          <td><code>{{ event["keyword"] }}</code></td>
+          <td><span class="badge {{ event['status'] }}">{{ event["status"] }}</span></td>
+          <td>{{ event["reason"] }}</td>
+          <td class="reply-cell">{{ event["reply_text"] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">没有符合条件的记录。</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}设置 · TG 群回复{% endblock %}
+{% block content %}
+<h1>设置</h1>
+
+<form method="post" action="/settings/save" class="grid-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <section class="card span-2">
+    <h2>运行控制</h2>
+    <label class="check"><input type="checkbox" name="paused" {% if settings.get('paused') == 'true' %}checked{% endif %}> 暂停所有自动回复</label>
+    <label class="check"><input type="checkbox" name="ignore_bots" {% if settings.get('ignore_bots') == 'true' %}checked{% endif %}> 忽略机器人发送的消息</label>
+    <div class="grid-form inner">
+      <label>群内最短间隔（秒）<input name="min_seconds_between_replies_in_chat" inputmode="numeric" value="{{ settings.get('min_seconds_between_replies_in_chat', '15') }}"></label>
+      <label>单群每分钟上限<input name="max_replies_per_chat_per_minute" inputmode="numeric" value="{{ settings.get('max_replies_per_chat_per_minute', '3') }}"></label>
+      <label>单群每日上限<input name="max_replies_per_chat_per_day" inputmode="numeric" value="{{ settings.get('max_replies_per_chat_per_day', '50') }}"></label>
+      <label>全局每分钟上限<input name="max_replies_global_per_minute" inputmode="numeric" value="{{ settings.get('max_replies_global_per_minute', '5') }}"></label>
+    </div>
+  </section>
+
+  <section class="card span-2">
+    <h2>网络代理</h2>
+    <p class="muted">服务器能直连 Telegram 时不需要开启。只有连接失败时才填写。</p>
+    <label class="check"><input type="checkbox" name="proxy_enabled" {% if settings.get('proxy_enabled') == 'true' %}checked{% endif %}> 使用代理连接 Telegram</label>
+    <div class="grid-form inner">
+      <label>类型
+        <select name="proxy_kind">
+          <option value="socks5" {% if settings.get('proxy_kind') == 'socks5' %}selected{% endif %}>SOCKS5</option>
+          <option value="socks4" {% if settings.get('proxy_kind') == 'socks4' %}selected{% endif %}>SOCKS4</option>
+          <option value="http" {% if settings.get('proxy_kind') == 'http' %}selected{% endif %}>HTTP</option>
+        </select>
+      </label>
+      <label>地址<input name="proxy_host" value="{{ settings.get('proxy_host', '') }}"></label>
+      <label>端口<input name="proxy_port" inputmode="numeric" value="{{ settings.get('proxy_port', '1080') }}"></label>
+      <label>用户名<input name="proxy_username" value="{{ settings.get('proxy_username', '') }}"></label>
+      <label>密码<input type="password" name="proxy_password" value="{{ settings.get('proxy_password', '') }}"></label>
+    </div>
+  </section>
+
+  <div class="form-actions span-2"><button class="btn primary" type="submit">保存设置</button></div>
+</form>
+
+<section class="card">
+  <h2>修改管理密码</h2>
+  <form method="post" action="/settings/password" class="grid-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>当前密码<input type="password" name="current_password" required></label>
+    <label>新密码（至少 8 位）<input type="password" name="new_password" minlength="8" required></label>
+    <label>确认新密码<input type="password" name="confirm_password" minlength="8" required></label>
+    <div class="form-actions"><button class="btn" type="submit">更新密码</button></div>
+  </form>
+</section>
+{% endblock %}

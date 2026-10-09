@@ -1,0 +1,17 @@
+[Unit]
+Description=Telegram Keyword Responder
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/srv/tg-keyword-responder
+EnvironmentFile=/srv/tg-keyword-responder/.env
+ExecStart=/srv/tg-keyword-responder/.venv/bin/python /srv/tg-keyword-responder/main.py
+Restart=always
+RestartSec=5
+User=tgkr
+Group=tgkr
+
+[Install]
+WantedBy=multi-user.target

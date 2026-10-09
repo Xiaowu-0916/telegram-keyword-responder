@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}编辑关键词 · TG 群回复{% endblock %}
+{% block content %}
+<h1>编辑关键词</h1>
+<section class="card">
+  <form method="post" action="/rules/{{ rule['id'] }}/update" class="grid-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>规则名称<input name="name" value="{{ rule['name'] }}"></label>
+    <label>关键词或正则<input name="pattern" value="{{ rule['pattern'] }}" required></label>
+    <label>匹配方式
+      <select name="match_type">
+        <option value="contains" {% if rule['match_type'] == 'contains' %}selected{% endif %}>包含</option>
+        <option value="regex" {% if rule['match_type'] == 'regex' %}selected{% endif %}>正则</option>
+        <option value="word" {% if rule['match_type'] == 'word' %}selected{% endif %}>整词（仅英文）</option>
+      </select>
+      <div class="hint">中文关键词建议用“包含”或“正则”；“整词”只对英文单词生效，含中文时会自动按“包含”处理。</div>
+    </label>
+    <label>关键词冷却（秒）<input name="cooldown_seconds" inputmode="numeric" value="{{ rule['cooldown_seconds'] }}"></label>
+    <label>同一用户冷却（秒）<input name="per_user_cooldown_seconds" inputmode="numeric" value="{{ rule['per_user_cooldown_seconds'] }}"></label>
+    <label class="span-2">回复内容<textarea name="reply" rows="4" required>{{ rule['reply'] }}</textarea></label>
+    <label class="check"><input type="checkbox" name="case_sensitive" {% if rule['case_sensitive'] %}checked{% endif %}> 区分大小写</label>
+    <label class="check"><input type="checkbox" name="enabled" {% if rule['enabled'] %}checked{% endif %}> 启用这条规则</label>
+    <fieldset class="span-2">
+      <legend>生效群组（不选表示所有已启用群）</legend>
+      {% if chats %}
+      <div class="check-list">
+        {% for chat in chats %}
+        <label class="check"><input type="checkbox" name="chat_ids" value="{{ chat['chat_id'] }}" {% if chat['chat_id'] in rule_chats %}checked{% endif %}> {{ chat["title"] }} <code>{{ chat["chat_id"] }}</code></label>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="muted">还没有启用任何群。</p>
+      {% endif %}
+    </fieldset>
+    <div class="form-actions span-2">
+      <button class="btn primary" type="submit">保存修改</button>
+      <a class="btn" href="/rules">返回</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

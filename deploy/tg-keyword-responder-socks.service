@@ -1,0 +1,15 @@
+[Unit]
+Description=SOCKS5 tunnel for Telegram Keyword Responder
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh -NT -D 127.0.0.1:11080 -i /etc/tg-keyword-responder/proxy_key -o BatchMode=yes -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new <PROXY_USER>@<PROXY_HOST>
+Restart=always
+RestartSec=5
+User=tgkr
+Group=tgkr
+
+[Install]
+WantedBy=multi-user.target

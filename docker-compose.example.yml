@@ -1,0 +1,11 @@
+services:
+  tg-keyword-responder:
+    build: .
+    container_name: tg-keyword-responder
+    # Host networking keeps the app on 127.0.0.1 so a local reverse proxy can reach it.
+    network_mode: host
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data

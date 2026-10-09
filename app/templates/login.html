@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}登录 · TG 群回复{% endblock %}
+{% block content %}
+<section class="login-wrap">
+  <div class="card login-card">
+    <h1>TG 群回复管理</h1>
+    <p class="muted">登录后可以配置 Telegram 账号、选择群组和关键词。</p>
+    <form method="post" action="/login" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>
+        用户名
+        <input name="username" value="admin" autocomplete="username" required>
+      </label>
+      <label>
+        密码
+        <input type="password" name="password" autocomplete="current-password" required>
+      </label>
+      <button class="btn primary wide" type="submit">登录</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

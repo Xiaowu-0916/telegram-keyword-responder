@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}群管理 · TG 群回复{% endblock %}
+{% block content %}
+<h1>群管理</h1>
+<p class="muted">只显示这个 Telegram 账号已经加入的群组。勾选后程序才会监听该群的消息。</p>
+
+{% if groups %}
+<form method="post" action="/groups/save">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <section class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>启用</th><th>群名称</th><th>群 ID</th><th>用户名</th><th>类型</th></tr></thead>
+        <tbody>
+          {% for group in groups %}
+          <tr>
+            <td><input type="checkbox" name="selected" value="{{ group.chat_id }}" {% if group.monitored %}checked{% endif %}></td>
+            <td>{{ group.title }}</td>
+            <td class="nowrap"><code>{{ group.chat_id }}</code></td>
+            <td>{% if group.username %}@{{ group.username }}{% endif %}</td>
+            <td>{{ group.kind }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="form-actions">
+      <button class="btn primary" type="submit">保存群设置</button>
+    </div>
+  </section>
+</form>
+{% else %}
+<section class="card">
+  <p class="muted">没有读取到群组。请确认 Telegram 账号已经登录，并且账号已经加入至少一个群。</p>
+  <a class="btn" href="/telegram">返回账号页</a>
+</section>
+{% endif %}
+{% endblock %}

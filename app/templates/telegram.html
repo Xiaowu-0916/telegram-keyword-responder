@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}账号 · TG 群回复{% endblock %}
+{% block content %}
+<h1>Telegram 账号</h1>
+
+{% if status.authorized %}
+<section class="card">
+  <h2>已登录</h2>
+  <dl class="kv">
+    <dt>名称</dt><dd>{{ status.me_name or "未命名" }}</dd>
+    <dt>用户名</dt><dd>{% if status.me_username %}@{{ status.me_username }}{% else %}无{% endif %}</dd>
+    <dt>账号 ID</dt><dd>{{ status.me_id }}</dd>
+    <dt>手机号</dt><dd>{{ status.phone or "未知" }}</dd>
+  </dl>
+  <p class="muted">登录会话保存在服务器上。下一步去“群管理”选择要监听的群。</p>
+  <div class="form-actions">
+    <a class="btn primary" href="/groups">选择群组</a>
+    <form method="post" action="/telegram/logout" onsubmit="return confirm('确定退出这个 Telegram 账号？');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn" type="submit">退出账号</button>
+    </form>
+  </div>
+</section>
+{% else %}
+<section class="card">
+  <h2>1. 填写 API 凭据</h2>
+  <p class="muted">在 my.telegram.org 创建应用后，把 api_id 和 api_hash 填到这里。</p>
+  <form method="post" action="/telegram/api" class="grid-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>api_id<input name="api_id" inputmode="numeric" required></label>
+    <label>api_hash<input name="api_hash" required></label>
+    <div class="form-actions"><button class="btn primary" type="submit">保存 API 凭据</button></div>
+  </form>
+</section>
+
+{% if status.configured %}
+<section class="card">
+  <h2>2. 手机号登录</h2>
+  <form method="post" action="/telegram/send-code" class="grid-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>手机号（含国家代码）<input name="phone" value="{{ status.phone }}" placeholder="+8613800000000" required></label>
+    <div class="form-actions"><button class="btn primary" type="submit">发送验证码</button></div>
+  </form>
+</section>
+{% endif %}
+
+{% if status.pending_code %}
+<section class="card">
+  <h2>3. 输入验证码</h2>
+  <p class="muted">验证码会发送到 Telegram 客户端，不是短信。</p>
+  <form method="post" action="/telegram/sign-in" class="grid-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>验证码<input name="code" inputmode="numeric" autocomplete="one-time-code" required></label>
+    <div class="form-actions"><button class="btn primary" type="submit">登录</button></div>
+  </form>
+</section>
+{% endif %}
+
+{% if status.pending_password %}
+<section class="card">
+  <h2>4. 两步验证</h2>
+  <form method="post" action="/telegram/password" class="grid-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>两步验证密码<input type="password" name="password" required></label>
+    <div class="form-actions"><button class="btn primary" type="submit">完成登录</button></div>
+  </form>
+</section>
+{% endif %}
+{% endif %}
+{% endblock %}

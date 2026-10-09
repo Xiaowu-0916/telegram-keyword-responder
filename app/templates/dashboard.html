@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}总览 · TG 群回复{% endblock %}
+{% block content %}
+<h1>总览</h1>
+
+{% if status.authorized %}
+<div class="banner ok">
+  账号已登录：{{ status.me_name or "未命名" }}
+  {% if status.me_username %}@{{ status.me_username }}{% endif %}
+  · 监听中
+</div>
+{% elif status.configured %}
+<div class="banner warn">Telegram 账号尚未登录。<a href="/telegram">去登录</a></div>
+{% else %}
+<div class="banner warn">还没有配置 Telegram API 凭据。<a href="/telegram">去配置</a></div>
+{% endif %}
+
+<div class="stats">
+  <div class="stat"><span>监听群组</span><strong>{{ stats.monitored }}</strong></div>
+  <div class="stat"><span>启用关键词</span><strong>{{ stats.rules }}</strong></div>
+  <div class="stat"><span>今日已回复</span><strong>{{ stats.sent_today }}</strong></div>
+  <div class="stat"><span>今日跳过</span><strong>{{ stats.skipped_today }}</strong></div>
+  <div class="stat"><span>今日错误</span><strong>{{ stats.errors_today }}</strong></div>
+</div>
+
+<section class="card">
+  <div class="card-head">
+    <h2>最近记录</h2>
+    <a class="link" href="/logs">全部日志</a>
+  </div>
+  {% if events %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>时间</th><th>群</th><th>关键词</th><th>状态</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+        <tr>
+          <td class="nowrap">{{ event["ts"]|dt }}</td>
+          <td>{{ event["chat_title"] or event["chat_id"] }}</td>
+          <td>{{ event["keyword"] }}</td>
+          <td><span class="badge {{ event['status'] }}">{{ event["status"] }}</span></td>
+          <td>{{ event["reason"] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">还没有记录。先在群管理里选择群组，再添加关键词。</p>
+  {% endif %}
+</section>
+{% endblock %}
